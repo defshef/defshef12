@@ -2,3 +2,5 @@ target/
 .lein*
 resources/public/js/compiled
 .repl
+.nrepl-port
+out/

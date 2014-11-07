@@ -6,17 +6,23 @@
             [figwheel.client :as figwheel]
             [clojure.browser.repl]))
 
-(enable-console-print!)
+;; printing goes to browser console
+(let [c js/console
+      log (.-log c)]
+  (set-print-fn!
+   (fn [& args]
+     (let [args (if (= (last args) "\n") (butlast args) args)]
+       (.apply log c (into-array args))))))
 
 (defn render []
-  (println "Rendering page with"
-           (prn-str @defshef12.app/state))
   (reagent/render-component
-   [defshef12.app/app]
-   (.-body js/document)))
+   [defshef12.app/todo-app]
+   (.getElementById js/document "main-area")))
 
 ; Stuff to run on initial page load
-(defonce startup (render))
+(defonce startup (do
+                   (defshef12.app/init)
+                   (render)))
 
 ; Figwheel will run things for us after every change
 (figwheel/watch-and-reload
