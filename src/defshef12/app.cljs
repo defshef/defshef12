@@ -7,15 +7,17 @@
 (defonce title (atom "Hello World"))
 (defonce todos (atom (sorted-map)))
 (defonce max-id (atom 0))
+(add-watch todos :max-id
+           (fn [_ _ _ state]
+             (reset! max-id (apply max 1 (keys state)))))
 
-(defn init []
+(defn init-local-storage []
   (let [local-storage (.-localStorage js/window)
         storage-key "todos-defshef12"]
-    ; read from local storage
+    ; read todos from local storage
     (if-let [data (aget local-storage storage-key)]
       (let [state (try (read-string data) (catch js/Error _ nil))]
-        (apply swap! todos conj state)
-        (reset! max-id (apply max (map :id state)))))
+        (apply swap! todos conj state)))
     ; write to local-storage on data change
     (add-watch todos :local-storage
                (fn [_ _ _ state]
@@ -60,47 +62,45 @@
   [m]
   (string/join " " (for [[k v] m :when v] (name k))))
 
+(defn todo-input [{:keys [save-input stop-input] :as props}]
+  (let [save (fn [e]
+               (let [elem (.-target e)]
+                 (when (save-input (.-value elem))
+                   (set! (.-value elem) "")
+                   (stop-input))))]
+    [:input
+     (merge props
+            {:type :text
+             :auto-focus true
+             :on-blur save
+             :on-key-up (fn [e] (condp = (.-which e)
+                                  ENTER (save e)
+                                  ESCAPE (stop-input)
+                                  nil))})]))
+
 (defn todo-item []
-  (let [editing (atom false)
-        start-edit #(reset! editing true)
-        stop-edit #(reset! editing false)]
+  (let [editing (atom false)]
     (fn [{:keys [id title completed]}]
-      (let [html-id (str "checkbox" id)
-            show-edit @editing
-            save-edit
-            (fn [e]
-              (let [elem (.-target e)]
-                (when (edit-todo! id (.-value elem))
-                  (set! (.-value elem) "")
-                  (stop-edit))))]
-        [:li
-         {:class (class-set {:completed completed
-                             :editing show-edit})}
-         (if-not show-edit
+      [:li
+       {:class (class-set {:completed completed
+                           :editing @editing})}
+       [:div.view
+        [:input.toggle
+         {:type :checkbox
+          :checked completed
+          :on-change #(toggle-todo! id)}]
+        [:label
+         {:on-double-click #(reset! editing true)}
+         title]
+        [:button.destroy
+         {:on-click #(remove-todo! id)}]]
 
-           [:div.view
-            [:input.toggle
-             {:type :checkbox
-              :id html-id
-              :checked completed
-              :on-change #(toggle-todo! id)}]
-            [:label
-             {:on-double-click start-edit}
-             title]
-            [:button.destroy
-             {:on-click #(remove-todo! id)}]]
-
-           [:input.edit
-            {:auto-focus true
-             :default-value title
-             :on-blur save-edit
-             :on-key-up
-             (fn [e]
-               (condp = (.-which e)
-                 ENTER (save-edit e)
-                 ESCAPE (stop-edit)
-                 nil))}])
-         ]))))
+       (when @editing
+         [todo-input
+          {:class "edit"
+           :default-value title
+           :save-input #(edit-todo! id %)
+           :stop-input #(reset! editing false)}])])))
 
 (defn todo-list [todos]
   [:ul#todo-list
@@ -108,15 +108,11 @@
      ^{:key (:id todo)} [todo-item todo])])
 
 (defn todo-add []
-  [:input#new-todo
-   {:placeholder "What needs to be done?"
-    :auto-focus true
-    :on-key-up
-    (fn [e]
-      (let [elem (.-target e)]
-        (if (= ENTER (.-which e))
-          (when (add-todo! (.-value elem))
-            (set! (.-value elem) "")))))}])
+  [todo-input
+   {:id "new-todo"
+    :placeholder "What needs to be done?"
+    :save-input add-todo!
+    :stop-input (fn [])}])
 
 (defn todo-main [todos]
   (let [all (every? :completed todos)]

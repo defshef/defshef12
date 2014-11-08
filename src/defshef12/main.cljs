@@ -1,8 +1,8 @@
 (ns defshef12.main
   (:require [react]
             [reagent.core :as reagent]
-            [defshef12.app]
-            [defshef12.sepl]
+            [defshef12.app :as app]
+            [defshef12.sepl :as sepl]
             [figwheel.client :as figwheel]
             [clojure.browser.repl]))
 
@@ -16,12 +16,14 @@
 
 (defn render []
   (reagent/render-component
-   [defshef12.app/todo-app]
+   [app/todo-app]
    (.getElementById js/document "main-area")))
 
 ; Stuff to run on initial page load
 (defonce startup (do
-                   (defshef12.app/init)
+                   (app/init-local-storage)
+                   (when (empty? @app/todos)
+                     (sepl/initial-data))
                    (render)))
 
 ; Figwheel will run things for us after every change
