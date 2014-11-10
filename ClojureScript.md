@@ -170,7 +170,9 @@ There's also a shorthand for doing anonymous functions, the `%` symbol is replac
 
 ## Destructuring
 
-[TODO](http://clojure.org/special_forms#Special%20Forms--Binding%20Forms%20%28Destructuring%29)
+    TODO
+
+[Full docs on destructuring](http://clojure.org/special_forms#Special%20Forms--Binding%20Forms%20%28Destructuring%29)
 
 ## Namespaces
 
