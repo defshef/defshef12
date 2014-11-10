@@ -1,6 +1,6 @@
 # (def shef 12)
 
-A mostly self-guided workshop to get to grips with ClojureScript.
+A hopefully self-guided workshop to get to grips with ClojureScript.
 
 We'll be building an implementation of [TodoMVC](https://github.com/tastejs/todomvc/blob/master/app-spec.md) using [figwheel](https://github.com/bhauman/lein-figwheel) and [Reagent](http://holmsand.github.io/reagent/).
 
@@ -8,6 +8,21 @@ We'll be building an implementation of [TodoMVC](https://github.com/tastejs/todo
 
 * Leiningen
 * Java JRE 7+
+
+## Steps
+
+Feel free to skip ahead or do these in a different order.
+
+ 1. Familiarise yourself with some [basic ClojureScript syntax](ClojureScript.md).
+ 2. Run the [figwheel server](#save-to-reload) and load the [app](http://localhost:3449).
+ 3. Use the `sepl.cljs` file to run some ClojureScript
+ 4. Try calling the functions ending in `!` to modify the application's data and watch the UI update.
+ 5. Using the TodoMVC site and `reference/index.html` as your reference, add the appropriate `class` and `id` attributes to style the todo list
+ 6. Consult the [TodoMVC Spec](https://github.com/tastejs/todomvc/blob/master/app-spec.md) if you need more info on how the following features should work.
+ 7. Add the **delete** button to each todo item and wire it up to the `remove-todo!` function.
+ 8. Add the **active** filter option to the footer, and have it update the displayed todo items.
+ 9. Add the **Clear Completed** button to the footer, including the item count and hiding when there are no completed todos. You can wire it up to the `clear-completed-todos!` function, or write your own.
+ 10. Add the **toggle-all** checkbox to the top of the list, including having it update itself when all items are ticked. You can wire it up to the `set-all-todos!` function, or write your own.
 
 ## Usage
 
