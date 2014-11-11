@@ -16,7 +16,7 @@ In Clojure, any commas `,` are treated exactly the same as whitespace. They are 
 7e5
 ```
 
-**Booleans** also exist
+**Booleans** also exist.
 ```clojure
 true
 false
@@ -26,6 +26,11 @@ false
 ```clojure
 "and basically"
 "do what you'd expect"
+```
+
+**nil** represents NULL, and has to exist because of the host platform.
+```clojure
+nil
 ```
 
 **Keywords** are symbolic identifiers, they provide very fast equality tests, and so are often used as keys in datastructures.
@@ -74,27 +79,35 @@ See the cheatsheet linked at the bottom of the page for functions that can opera
 ; => 2
 ```
 
-**Hash-maps** are key-value collections with undefined order. There is a variant **sorted-map** which keeps the keys in a defined order.
+**Hash-maps** are key-value collections with undefined order. There is a variant **sorted-map** which keeps the keys in a defined order. We often use keywords as the keys.
 ```clojure
 (hash-map :a 1 :b 2)
-; => {:a 1 :b 2}
-{:hello "World" :store "Stuff"}
-; => {:hello "World" :store "Stuff"}
+; => {:a 1, :b 2}
+{:hello "World", :store "Stuff"}
+; => {:hello "World", :store "Stuff"}
+
+; assoc and dissoc add/remove values
 (assoc {:a 1} :b 2)
-; => {:a 1 :b 2}
+; => {:a 1, :b 2}
 (dissoc {:a 1 :b 2} :b)
 ; => {:a 1}
 
 ; maps can be called as functions to get values
 ({:a 1 :b 2} :b)
 ; => 2
-; so can keywords
+; keywords are also getter functions
 (:a {:a 1 :b 2})
 ; => 1
 
+; there are *-in variants for nested maps
+(assoc-in {:a {:b 1}} [:a :b] 42)
+; => {:a {:b 42}}
+; update-in lets us apply a function to a nested item
+(update-in {:a {:b 1}} [:a :b] inc)
+; => {:a {:b 2}}
 
 (sorted-map 2 :b 1 :a)
-=> {1 :a 2 :b}
+=> {1 :a, 2 :b}
 ```
 
 ## Variables
@@ -123,6 +136,33 @@ Local names can be bound using the `let` form. The form takes a vector of bindin
 ; => 3
 ```
 
+## Output
+
+Clojure provides a few core functions for getting output to the console. In ClojureScript this is usually set up to print to the browser console, but it can be changed using `set-print-fn!`.
+
+`println` is used to get a human readable representation with a newline on the end.
+```clojure
+(prn [1 2 3])
+; => [1 2 3]
+
+(prn "Can" "take" "a bunch" [:of :arguments])
+; => "Can" "take" "a bunch" [:of :arguments]
+```
+
+`print`, `prn` and `pr` are related and also sometimes useful.
+
+## Loops
+
+Clojure doesn't really do loops in the traditional sense. The usual preference is to favour higher order functions like `map`, `filter` and `reduce`. See the Sequences section in the cheatsheet for more.
+
+The `for` form works much like a list comprehension. It uses a binding like the let form that is applied to every item in the input sequence and describes how to create a new sequence.
+
+```clojure
+(for [a (range 10) :when (odd? a)]
+  (* a a))
+; => (1 9 25 49 81)
+```
+
 ## Conditionals
 
 The basic conditional is the `if` form.
@@ -148,6 +188,7 @@ Functions are defined using the `fn` form, which takes a vector of local names t
 ```clojure
 (fn [a b] (+ a (* a b)))
 ; => fn
+
 ((fn [a b] (+ a (* a b))) 2 2)
 ; => 6
 ```
@@ -170,7 +211,30 @@ There's also a shorthand for doing anonymous functions, the `%` symbol is replac
 
 ## Destructuring
 
-    TODO
+To further reduce boilerplate in binding forms and function definitions, we can use data structures on the left hand side of assignments to unpack variables. Note that this is not pattern matching, if the destructuring form doesn't match we will either get a runtime error or nil values.
+
+We can destructure vectors in `let`, `for` and funtions.
+```clojure
+(let [[a b] [1 2]]
+  (+ a b))
+; => 3
+
+(defn repeat-pair [[a b :as v]]
+  (conj v a b))
+(repeat-pair [1 2])
+; => [1 2 1 2]
+
+(for [[k v] {:a 1 :b 2 :c 3}]
+  (repeat v k))
+; => ((:c :c :c) (:b :b) (:a))
+```
+
+We can also destructure maps with the `:keys` shorthand when they have keyword keys.
+```clojure
+(let [{:keys [a b c]} {:a 1 :b 2 :c 3}]
+  (+ a b c))
+; => 6
+```
 
 [Full docs on destructuring](http://clojure.org/special_forms#Special%20Forms--Binding%20Forms%20%28Destructuring%29)
 
@@ -201,7 +265,7 @@ To save some typing, you can `require` a namespace and give it a shorter local n
 
 ## Atoms
 
-Clojure provides a bunch of nice abstractions for dealing with mutable state, we'll just look at the simplest one: an `atom`.
+Clojure provides a bunch of nice abstractions for dealing with mutable state, we'll just look at the simplest one - an `atom`.
 
     TODO
 
@@ -209,7 +273,14 @@ Clojure provides a bunch of nice abstractions for dealing with mutable state, we
 
 One of the core features of Clojure and ClojureScript is that they maintain a close relation with their host platforms - the JVM and JavaScript.
 
-    TODO
+JavaScript globals can be accessed via the `js/` namespace. Method calls are functions beginning with a dot (the object becomes argument 1), property access by prefixing with a dot and dash. `set!` can be used to modify JS values.
+
+```clojure
+(js/alert "Woooot")
+; alert box!
+
+(.getElementById js/document "main")
+```
 
 ## That'll do for now
 
