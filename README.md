@@ -9,6 +9,15 @@ We'll be building an implementation of [TodoMVC](https://github.com/tastejs/todo
 * Leiningen
 * Java JRE 7+
 
+## Setup
+
+This branch (master) is the finished product, to get the half-completed version of the app that you can work on, you should clone the "template" branch.
+
+```sh
+git clone https://github.com/defshef/defshef12.git -b template
+cd defshef12
+```
+
 ## Steps
 
 Feel free to skip ahead or do these in a different order.
