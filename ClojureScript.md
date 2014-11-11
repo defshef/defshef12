@@ -280,6 +280,18 @@ JavaScript globals can be accessed via the `js/` namespace. Method calls are fun
 ; alert box!
 
 (.getElementById js/document "main")
+; => #<[object HTMLDivElement]>
+
+(.-navigator js/window)
+; => #<[object Navigator]>
+
+(.. js/window -navigator -platform)
+; => "MacIntel"
+
+(set! (.-foo js/window) "bar")
+; => "bar"
+(.-foo js/window)
+; => "bar"
 ```
 
 ## That'll do for now
