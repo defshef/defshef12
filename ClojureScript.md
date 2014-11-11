@@ -196,9 +196,9 @@ Functions are defined using the `fn` form, which takes a vector of local names t
 This can get a bit annoying to type, but we can use `defn` to `def` and `fn` at the same time.
 
 ```clojure
-(defn double [w] (list w w))
+(defn twice [w] (list w w))
 
-(double "you")
+(twice "you")
 ; => ("you" "you")
 ```
 
