@@ -28,12 +28,12 @@ false
 "do what you'd expect"
 ```
 
-**nil** represents NULL, and has to exist because of the host platform.
+**nil** represents `null`, and has to exist because of the host platform.
 ```clojure
 nil
 ```
 
-**Keywords** are symbolic identifiers, they provide very fast equality tests, and so are often used as keys in datastructures.
+**Keywords** are symbolic identifiers, they provide very fast equality tests, and so are often used as keys in associative datastructures.
 ```clojure
 :keywords
 :can-also-contain-dashes
