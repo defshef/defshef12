@@ -265,9 +265,39 @@ To save some typing, you can `require` a namespace and give it a shorter local n
 
 ## Atoms
 
-Clojure provides a bunch of nice abstractions for dealing with mutable state, we'll just look at the simplest one - an `atom`.
+While the core datastructures are immutable, sometimes we do still want to deal with a value that changes over time. Clojure provides a bunch of nice abstractions for dealing with mutable state, we'll just look at the simplest one - an `atom`.
 
-    TODO
+An **atom** is a reference type that wraps and immutable value, the value can be extracted or updated at any time. The `deref` function is used to extract the current value.
+
+```clojure
+(def foo (atom 1))
+; => #<Atom: 1>
+
+(deref foo)
+; => 1
+; this is common, so there's a shorthand
+@foo
+; => 1
+```
+
+The value can either be changed wholesale via `reset!`, or modified with a function using `swap!`.
+
+```clojure
+(reset! foo 2)
+; => 2
+@foo
+; => 2
+
+(swap! foo inc)
+; => 3
+@foo
+; => 3
+
+(swap! foo + 7)
+; => 10
+```
+
+Atoms are discussed further in the [Clojure Documentation](http://clojure.org/atoms)
 
 ## JavaScript
 
