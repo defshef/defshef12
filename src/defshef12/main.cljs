@@ -3,7 +3,7 @@
             [defshef12.app :as app]
             [defshef12.sepl :as sepl]))
 
-;; printing goes to browser console
+; printing goes to browser console
 (enable-console-print!)
 
 (defn render []

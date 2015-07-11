@@ -3,7 +3,12 @@
             [cljs.reader :refer (read-string)]
             [reagent.core :refer (atom)]))
 
-;; define our app data so that it doesn't get over-written on reload
+
+; *************************
+; ** define our app data **
+; *************************
+
+; we use (defonce) so it doesn't get replaced on reload
 (defonce title (atom "Hello World"))
 (defonce todos (atom (sorted-map)))
 (defonce max-id (atom 0))
@@ -11,21 +16,13 @@
            (fn [_ _ _ state]
              (reset! max-id (apply max 1 (keys state)))))
 
-(defn init-local-storage []
-  (let [local-storage (.-localStorage js/window)
-        storage-key "todos-defshef12"]
-    ; read todos from local storage
-    (if-let [data (aget local-storage storage-key)]
-      (let [state (try (read-string data) (catch js/Error _ nil))]
-        (apply swap! todos conj state)))
-    ; write to local-storage on data change
-    (add-watch todos :local-storage
-               (fn [_ _ _ state]
-                 (aset local-storage storage-key (pr-str state))))))
 
-; HTML keycode values
-(def ENTER 13)
-(def ESCAPE 27)
+
+; **************************************
+; ** functions to manipulate app data **
+; **************************************
+
+; functions ending in ! make modifications
 
 (defn add-todo! [text]
   (let [title (string/trim text)]
@@ -56,29 +53,82 @@
 (defn clear-completed-todos! []
   (swap! todos #(into {} (remove (comp :completed val) %))))
 
+
+
+
+;; Some UI helper functions
+
+; HTML keycode values
+(def ENTER 13)
+(def ESCAPE 27)
+
 (defn class-set
   "Given a map create an HTML element's class value
   containing every key that has a truthy value"
   [m]
   (string/join " " (for [[k v] m :when v] (name k))))
 
-(defn todo-input [{:keys [save-input stop-input] :as props}]
-  (let [save (fn [e]
-               (let [elem (.-target e)]
-                 (when (save-input (.-value elem))
-                   (set! (.-value elem) "")
-                   (stop-input))))]
-    [:input
-     (merge props
-            {:type :text
-             :auto-focus true
-             :on-blur save
-             :on-key-up (fn [e] (condp = (.-which e)
-                                  ENTER (save e)
-                                  ESCAPE (stop-input)
-                                  nil))})]))
 
-(defn todo-item []
+
+
+; *******************************
+; ** user interface components **
+; *******************************
+(declare todo-app todo-add todo-main todo-item todo-input todo-footer)
+
+(def filters {"All" (constantly true)
+              "Active" (complement :completed)
+              "Completed" :completed})
+
+(defn todo-app
+  "The whole application"
+  []
+  (let [current-filter (atom (-> filters keys first))
+        pick-filter (fn [name] (if (contains? filters name)
+                                 (reset! current-filter name)))]
+    (fn []
+      (let [selected-filter @current-filter
+            all-todos (vals @todos)
+            items (filter (filters selected-filter) all-todos)]
+        [:section#todoapp
+         [:header#header
+          [:h1 @title]
+          [todo-add]]
+         (if-not (empty? items)
+           [todo-main items])
+         (if-not (empty? all-todos)
+           [todo-footer
+            {:selected-filter selected-filter
+             :pick-filter pick-filter}
+            items])]))))
+
+(defn todo-add
+  "The input for adding todos"
+  []
+  [todo-input
+   {:id "new-todo"
+    :placeholder "What needs to be done?"
+    :save-input add-todo!
+    :stop-input (fn [])}])
+
+(defn todo-main
+  "The middle section of the app"
+  [todos]
+  (let [all (every? :completed todos)]
+    [:section#main
+     [:input#toggle-all
+      {:type :checkbox
+       :checked all
+       :on-change #(set-all-todos! (not all))}]
+     [:label
+      {:for :toggle-all} "Mark all as complete"]
+     [:ul#todo-list
+      (for [todo todos]
+        ^{:key (:id todo)} [todo-item todo])]]))
+
+(defn todo-item
+  "A todo in the list"
+  []
   (let [editing (atom false)]
     (fn [{:keys [id title completed]}]
       [:li
@@ -102,34 +152,27 @@
            :save-input #(edit-todo! id %)
            :stop-input #(reset! editing false)}])])))
 
-(defn todo-list [todos]
-  [:ul#todo-list
-   (for [todo todos]
-     ^{:key (:id todo)} [todo-item todo])])
+(defn todo-input
+  "The actual todo input box"
+  [{:keys [save-input stop-input] :as props}]
+  (let [save (fn [e]
+               (let [elem (.-target e)]
+                 (when (save-input (.-value elem))
+                   (set! (.-value elem) "")
+                   (stop-input))))]
+    [:input
+     (merge props
+            {:type :text
+             :auto-focus true
+             :on-blur save
+             :on-key-up (fn [e] (condp = (.-which e)
+                                  ENTER (save e)
+                                  ESCAPE (stop-input)
+                                  nil))})]))
 
-(defn todo-add []
-  [todo-input
-   {:id "new-todo"
-    :placeholder "What needs to be done?"
-    :save-input add-todo!
-    :stop-input (fn [])}])
-
-(defn todo-main [todos]
-  (let [all (every? :completed todos)]
-    [:section#main
-     [:input#toggle-all
-      {:type :checkbox
-       :checked all
-       :on-change #(set-all-todos! (not all))}]
-     [:label
-      {:for :toggle-all} "Mark all as complete"]
-     [todo-list todos]]))
-
-(def filters {"All" (constantly true)
-              "Active" (complement :completed)
-              "Completed" :completed})
-
-(defn todo-footer [{:keys [selected-filter pick-filter]} items]
+(defn todo-footer
+  "The footer component"
+  [{:keys [selected-filter pick-filter]} items]
   (let [active (count (remove :completed items))
         done (- (count items) active)]
     [:footer#footer
@@ -150,22 +193,19 @@
         {:on-click clear-completed-todos!}
         "Clear Completed (" done ")"])]))
 
-(defn todo-app []
-  (let [current-filter (atom (-> filters keys first))
-        pick-filter (fn [name] (if (contains? filters name)
-                                 (reset! current-filter name)))]
-    (fn []
-      (let [selected-filter @current-filter
-            all-todos (vals @todos)
-            items (filter (filters selected-filter) all-todos)]
-        [:section#todoapp
-         [:header#header
-          [:h1 @title]
-          [todo-add]]
-         (if-not (empty? items)
-           [todo-main items])
-         (if-not (empty? all-todos)
-           [todo-footer
-            {:selected-filter selected-filter
-             :pick-filter pick-filter}
-            items])]))))
+
+
+
+(defn init-local-storage
+  "Setup syncing between todos & window.localStorage"
+  []
+  (let [local-storage (aget js/window "localStorage")
+        storage-key "todos-defshef12"]
+    ; read todos from local storage
+    (if-let [data (aget local-storage storage-key)]
+      (let [state (try (read-string data) (catch js/Error _ nil))]
+        (apply swap! todos conj state)))
+    ; write to local-storage on data change
+    (add-watch todos :local-storage
+               (fn [_ _ _ state]
+                 (aset local-storage storage-key (pr-str state))))))

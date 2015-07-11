@@ -2,7 +2,10 @@
   "Save Eval Print Loop"
   (:require [defshef12.app :as app]))
 
-(println "Edits to this text should show up in your developer console.")
+; printing goes to browser console
+(enable-console-print!)
+
+(println "Edit this text in sepl.cljs, it'll show up in your dev console.")
 
 ; (reset! app/title "ClojureScript!")
 
