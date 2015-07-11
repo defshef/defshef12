@@ -7,7 +7,7 @@ We'll be building an implementation of [TodoMVC](https://github.com/tastejs/todo
 ## Requirements
 
 * Leiningen
-* Java JRE 7+
+* Java JDK 7+ (sorry)
 
 ## Setup
 
@@ -49,31 +49,7 @@ Whenever a file is saved, the app code will automatically reload without destroy
 
 You can use the `sepl.cljs` file to execute bits of ClojureScript code without editing the rest of the application files.
 
-### Terminal REPL
-
-If you'd like a more traditional commandline REPL to interact with the application you can attach to the nREPL server from a second terminal session.
-
-```sh
-# Assuming figwheel server is running
-lein trampoline repl :connect
-```
-
-
-You will now be at a clojure prompt
-
-Run the following and ignore the warnings, they're not a problem
-
-```clojure
-(browser-repl)
-```
-
-Reload the app in a web browser to connect
-
-You can now type ClojureScript here that will eval in the browser
-
-```clojure
-(js/alert "I'm in ur browser")
-```
+You can also type into the terminal running figwheel to execute ClojureScript.
 
 ## How it works
 
@@ -83,9 +59,8 @@ You can now type ClojureScript here that will eval in the browser
 * `app.cljs` defines the application behaviour
 * The figwheel server also serves up a websocket
 * `main.cljs` uses Reagent to render the application with the `(render)` function
-* `main.cljs` also connects to the websocket server and wires things together
 * Figwheel watches the filesystem for changes
 * When files change, figwheel recompiles and notifies connected clients over the websocket
-* The client code re-requests the latest code from the server when it receives a change notification
+* The figwheel client code re-requests the latest code from the server when it receives a change notification
 * The new code overwrites the old definitions, except when `(defonce)` was used
 * The client code is configured to run the `(render)` function whenever there has been a code change
