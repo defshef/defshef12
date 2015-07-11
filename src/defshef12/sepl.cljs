@@ -7,12 +7,15 @@
 
 (println "Edit this text in sepl.cljs, it'll show up in your dev console.")
 
-; (reset! app/title "ClojureScript!")
+ ;(reset! app/title "ClojureScript!")
 
 (defn initial-data []
-  (app/add-todo! "Buy Milk")
-  (app/add-todo! "Warm Milk")
-  (app/add-todo! "Drink Milk"))
+  (app/add-todo! "Book Union St")
+  (app/toggle-todo! @app/max-id)
+  (app/add-todo! "Prepare Workshop")
+  (app/toggle-todo! @app/max-id)
+  (app/add-todo! "Come up with witty todo items")
+  (app/add-todo! "Item 4"))
 
 ; Uncomment this to reset data
 ; (do (swap! app/todos empty) (initial-data))

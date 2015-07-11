@@ -9,7 +9,7 @@
 ; *************************
 
 ; we use (defonce) so it doesn't get replaced on reload
-(defonce title (atom "Hello World"))
+(defonce title (atom "TodoMVC"))
 (defonce todos (atom (sorted-map)))
 (defonce max-id (atom 0))
 (add-watch todos :max-id
