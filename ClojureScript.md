@@ -6,6 +6,20 @@ Comments in Clojure use a semicolon `;` and continue to the end of the line. `; 
 
 In Clojure, any commas `,` are treated exactly the same as whitespace. They are usually omitted.
 
+* [Primitives](#primitives)
+* [Function calling](#function-calling)
+* [Data Structures](#datastructures)
+* [Variables](#variables)
+* [Output](#output)
+* [Loops](#loops)
+* [Conditionals](#conditionals)
+* [Defining Functions](#defining-functions)
+* [Destructuring](#destructuring)
+* [Namespaces](#namespaces)
+* [Atoms](#atoms)
+* [JavaScript](#javascript)
+* [Other Links](#other-links)
+
 ## Primitives
 
 **Numbers** are always doubles, because JavaScript.
