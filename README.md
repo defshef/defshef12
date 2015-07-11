@@ -2,7 +2,7 @@
 
 A hopefully self-guided workshop to get to grips with ClojureScript.
 
-We'll be building an implementation of [TodoMVC](https://github.com/tastejs/todomvc/blob/master/app-spec.md) using [figwheel](https://github.com/bhauman/lein-figwheel) and [Reagent](http://holmsand.github.io/reagent/).
+We'll be building an implementation of [TodoMVC](https://github.com/tastejs/todomvc/blob/master/app-spec.md) using [figwheel](https://github.com/bhauman/lein-figwheel) and [Reagent](http://reagent-project.github.io/).
 
 ## Requirements
 
