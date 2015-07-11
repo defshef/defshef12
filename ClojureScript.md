@@ -114,7 +114,7 @@ See the cheatsheet linked at the bottom of the page for functions that can opera
 
 Clojure doesn't like to call anything a variable, its equivalents come in two flavours, local and global.
 
-Clojure's stores global values in `vars`. They are defined with `def`. All references to vars are late-bound, meaning that redefining a var will mean all existing references point to the latest value.
+Clojure's stores global values in `vars`. They are defined with `def`. All references to vars are late-bound, meaning that redefining a var will mean all existing references point to the latest value. There is also a variation on this called `defonce`, this does the same as `def`, but will be ignored if the var is already defined.
 ```clojure
 (def foo 1)
 
@@ -125,6 +125,16 @@ foo
 
 foo
 ; => 2
+
+(defonce bar 1)
+
+bar
+; => 1
+
+(defonce bar 2)
+
+bar
+; => 1
 ```
 
 Local names can be bound using the `let` form. The form takes a vector of bindings, which is a concept re-used in many other functions and macros. A binding vector is simply series of name-value pairs.
