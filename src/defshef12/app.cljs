@@ -76,14 +76,15 @@
 ; *******************************
 (declare todo-app todo-add todo-main todo-item todo-input todo-footer)
 
-(def filters {"All" (constantly true)
-              "Active" (complement :completed)
-              "Completed" :completed})
+(def filters
+  {"All"       (fn [] true)
+   "Active"    (fn [todo] (not (:completed todo)))
+   "Completed" (fn [todo] (:completed todo))})
 
 (defn todo-app
   "The whole application"
   []
-  (let [current-filter (atom (-> filters keys first))
+  (let [current-filter (atom "All")
         pick-filter (fn [name] (if (contains? filters name)
                                  (reset! current-filter name)))]
     (fn []
@@ -181,14 +182,18 @@
       [:strong active]
       " item" (if-not (= active 1) "s") " left"]
      [:ul#filters
-      (for [label (keys filters)]
-        [:li
-         {:key label}
-         [:a
-          {:href "#"
-           :class (if (= label selected-filter) "selected")
-           :on-click #(pick-filter label)}
-          label]])]
+      [:li [:a {:href "#"
+                :class (if (= "All" selected-filter) "selected")
+                :on-click #(pick-filter "All")}
+            "All"]]
+      [:li [:a {:href "#"
+                :class (if (= "Active" selected-filter) "selected")
+                :on-click #(pick-filter "Active")}
+            "Active"]]
+      [:li [:a {:href "#"
+                :class (if (= "Completed" selected-filter) "selected")
+                :on-click #(pick-filter "Completed")}
+            "Completed"]]]
      (if-not (zero? done)
        [:button#clear-completed
         {:on-click clear-completed-todos!}
