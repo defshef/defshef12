@@ -78,7 +78,6 @@
 
 (def filters
   {"All"       (fn [] true)
-   "Active"    (fn [todo] (not (:completed todo)))
    "Completed" (fn [todo] (:completed todo))})
 
 (defn todo-app
@@ -185,10 +184,6 @@
                 :class (if (= "All" selected-filter) "selected")
                 :on-click #(pick-filter "All")}
             "All"]]
-      [:li [:a {:href "#"
-                :class (if (= "Active" selected-filter) "selected")
-                :on-click #(pick-filter "Active")}
-            "Active"]]
       [:li [:a {:href "#"
                 :class (if (= "Completed" selected-filter) "selected")
                 :on-click #(pick-filter "Completed")}
