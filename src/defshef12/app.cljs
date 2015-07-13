@@ -91,8 +91,8 @@
       (let [selected-filter @current-filter
             all-todos (vals @todos)
             items (filter (filters selected-filter) all-todos)]
-        [:section#todoapp
-         [:header#header
+        [:section
+         [:header
           [:h1 @title]
           [todo-add]]
          (if-not (empty? items)
@@ -107,7 +107,7 @@
   "The input for adding todos"
   []
   [todo-input
-   {:id "new-todo"
+   {:id "add-todo"
     :placeholder "What needs to be done?"
     :save-input add-todo!
     :stop-input (fn [])}])
@@ -116,14 +116,14 @@
   "The middle section of the app"
   [todos]
   (let [all (every? :completed todos)]
-    [:section#main
+    [:section
      [:input#toggle-all
       {:type :checkbox
        :checked all
        :on-change #(set-all-todos! (not all))}]
      [:label
       {:for :toggle-all} "Mark all as complete"]
-     [:ul#todo-list
+     [:ul
       (for [todo todos]
         ^{:key (:id todo)} [todo-item todo])]]))
 
@@ -135,21 +135,20 @@
       [:li
        {:class (class-set {:completed completed
                            :editing @editing})}
-       [:div.view
-        [:input.toggle
+       [:div
+        [:input
          {:type :checkbox
           :checked completed
           :on-change #(toggle-todo! id)}]
         [:label
          {:on-double-click #(do (reset! editing true) nil)}
          title]
-        [:button.destroy
+        [:button
          {:on-click #(remove-todo! id)}]]
 
        (when @editing
          [todo-input
-          {:class "edit"
-           :default-value title
+          {:default-value title
            :save-input #(edit-todo! id %)
            :stop-input #(reset! editing false)}])])))
 
@@ -177,11 +176,11 @@
   [{:keys [selected-filter pick-filter]} items]
   (let [active (count (remove :completed items))
         done (- (count items) active)]
-    [:footer#footer
-     [:span#todo-count
+    [:footer
+     [:span
       [:strong active]
       " item" (if-not (= active 1) "s") " left"]
-     [:ul#filters
+     [:ul
       [:li [:a {:href "#"
                 :class (if (= "All" selected-filter) "selected")
                 :on-click #(pick-filter "All")}
@@ -195,7 +194,7 @@
                 :on-click #(pick-filter "Completed")}
             "Completed"]]]
      (if-not (zero? done)
-       [:button#clear-completed
+       [:button
         {:on-click clear-completed-todos!}
         "Clear Completed (" done ")"])]))
 
