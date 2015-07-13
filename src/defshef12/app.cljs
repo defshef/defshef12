@@ -164,8 +164,7 @@
 (defn todo-footer
   "The footer component"
   [{:keys [selected-filter pick-filter]} items]
-  (let [active (count (remove :completed items))
-        done (- (count items) active)]
+  (let [active (count (remove :completed items))]
     [:footer
      [:span
       [:strong active]
@@ -178,11 +177,7 @@
       [:li [:a {:href "#"
                 :class (if (= "Completed" selected-filter) "selected")
                 :on-click #(pick-filter "Completed")}
-            "Completed"]]]
-     (if-not (zero? done)
-       [:button
-        {:on-click clear-completed-todos!}
-        "Clear Completed (" done ")"])]))
+            "Completed"]]]]))
 
 
 
