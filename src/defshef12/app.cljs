@@ -140,7 +140,7 @@
           :checked completed
           :on-change #(toggle-todo! id)}]
         [:label
-         {:on-double-click #(reset! editing true)}
+         {:on-double-click #(do (reset! editing true) nil)}
          title]
         [:button.destroy
          {:on-click #(remove-todo! id)}]]
@@ -159,7 +159,8 @@
                (let [elem (.-target e)]
                  (when (save-input (.-value elem))
                    (set! (.-value elem) "")
-                   (stop-input))))]
+                   (stop-input)
+                   nil)))]
     [:input
      (merge props
             {:type :text
