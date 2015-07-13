@@ -141,9 +141,7 @@
           :on-change #(toggle-todo! id)}]
         [:label
          {:on-double-click #(do (reset! editing true) nil)}
-         title]
-        [:button
-         {:on-click #(remove-todo! id)}]]
+         title]]
 
        (when @editing
          [todo-input
