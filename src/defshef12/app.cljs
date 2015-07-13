@@ -114,17 +114,10 @@
 (defn todo-main
   "The middle section of the app"
   [todos]
-  (let [all (every? :completed todos)]
-    [:section
-     [:input#toggle-all
-      {:type :checkbox
-       :checked all
-       :on-change #(set-all-todos! (not all))}]
-     [:label
-      {:for :toggle-all} "Mark all as complete"]
-     [:ul
-      (for [todo todos]
-        ^{:key (:id todo)} [todo-item todo])]]))
+  [:section
+   [:ul
+    (for [todo todos]
+      ^{:key (:id todo)} [todo-item todo])]])
 
 (defn todo-item
   "A todo in the list"
